@@ -1,24 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-
-// Define the shape of our weather data
-type WeatherData = {
-  city: string
-  temperature: number
-  description: string
-  humidity: number
-  wind_speed: number
-}
+import { getCurrentWeather, WeatherResponse } from '@/lib/weather'
 
 export default function Home() {
-  // Now TypeScript knows exactly what weather looks like
-  const [city, setCity] = useState<string>('')
-  const [weather, setWeather] = useState<WeatherData | null>(null)
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string>('')
+  // State variables with proper types
+  const [city, setCity] = useState('')
+  const [weather, setWeather] = useState<WeatherResponse | null>(null)  // Fixed: no more 'any'
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  async function fetchWeather(): Promise<void> {
+  // Function to get weather data
+  const getWeather = async () => {
     if (!city.trim()) {
       setError('Please enter a city name')
       return
@@ -29,26 +22,22 @@ export default function Home() {
     setWeather(null)
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/weather/?city=${city}`)
-      
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to fetch weather')
-      }
-      
-      const data = await response.json()
+      // Use the API function from our library
+      const data = await getCurrentWeather(city)
       setWeather(data)
       
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } catch (err: unknown) {  // Better error typing
+      const message = err instanceof Error ? err.message : 'An error occurred'
+      setError(message)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Weather App
         </h1>
@@ -58,13 +47,13 @@ export default function Home() {
             type="text"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && fetchWeather()}
+            onKeyDown={(e) => e.key === 'Enter' && getWeather()}
             placeholder="Enter city name"
             className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none text-gray-700"
           />
 
           <button
-            onClick={fetchWeather}
+            onClick={getWeather}
             disabled={loading}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white font-semibold py-3 rounded-lg transition-colors"
           >

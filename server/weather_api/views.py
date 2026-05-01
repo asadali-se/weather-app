@@ -4,13 +4,14 @@ from rest_framework import status
 import requests
 import os
 from dotenv import load_dotenv
+from collections import defaultdict
 
 load_dotenv()
 
 @api_view(['GET'])
 def get_weather(request):
-    city = request.query_params.get('city', 'London')
-    
+    city = request.query_params.get('city')
+
     api_key = os.getenv('WEATHER_API_KEY')
     if not api_key:
         return Response(
