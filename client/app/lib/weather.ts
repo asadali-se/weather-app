@@ -1,5 +1,5 @@
-// API base URL - uses environment variable or defaults to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api'
+// API base URL
+const API_BASE_URL = 'http://127.0.0.1:8000/api'
 
 // Response types
 export interface WeatherResponse {
