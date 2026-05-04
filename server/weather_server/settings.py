@@ -20,6 +20,12 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Build the DATABASE_URL from individual PostgreSQL components if needed
+db_url = os.getenv('DATABASE_URL')
+if db_url and db_url.startswith('postgres://'):
+    # Railway and Render use postgres:// but psycopg2 requires postgresql://
+    db_url = db_url.replace('postgres://', 'postgresql://', 1)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
